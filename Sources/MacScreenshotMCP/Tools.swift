@@ -49,11 +49,6 @@ enum Tools {
                         "description": "Activate the app before capturing (restores minimized windows)",
                         "default": false,
                     ]),
-                    "scale": .object([
-                        "type": "integer",
-                        "description": "Pixel scale: 1 or 2 (Retina)",
-                        "default": 2,
-                    ]),
                     "save_path": .object([
                         "type": "string",
                         "description": "Where to save the PNG (default: ~/Pictures/mcp-captures/)",
@@ -76,11 +71,6 @@ enum Tools {
                     "window_id": .object([
                         "type": "integer",
                         "description": "Window ID from list_windows",
-                    ]),
-                    "scale": .object([
-                        "type": "integer",
-                        "description": "Pixel scale: 1 or 2 (Retina)",
-                        "default": 2,
                     ]),
                     "save_path": .object([
                         "type": "string",
@@ -110,11 +100,6 @@ enum Tools {
                             "w": .object(["type": "number"]),
                             "h": .object(["type": "number"]),
                         ]),
-                    ]),
-                    "scale": .object([
-                        "type": "integer",
-                        "description": "Pixel scale: 1 or 2 (Retina)",
-                        "default": 2,
                     ]),
                     "save_path": .object([
                         "type": "string",
@@ -236,9 +221,8 @@ enum Tools {
         }) else {
             return fail("Window \(pick.windowId) no longer available.")
         }
-        let scale = min(max(args["scale"]?.intValue ?? 2, 1), 2)
         let returnImage = args["return_image"]?.boolValue ?? true
-        let image = try await Capturer.captureWindow(scWindow, scale: scale)
+        let image = try await Capturer.captureWindow(scWindow)
         let png = try Capturer.pngData(from: image)
         let path = try Capturer.save(
             png: png, savePath: args["save_path"]?.stringValue, appName: app.name)
@@ -264,9 +248,8 @@ enum Tools {
         }) else {
             return fail("Window \(windowId) not found. Run list_windows to see available ids.")
         }
-        let scale = min(max(args["scale"]?.intValue ?? 2, 1), 2)
         let returnImage = args["return_image"]?.boolValue ?? true
-        let image = try await Capturer.captureWindow(scWindow, scale: scale)
+        let image = try await Capturer.captureWindow(scWindow)
         let png = try Capturer.pngData(from: image)
         let appName = scWindow.owningApplication?.applicationName
         let path = try Capturer.save(
@@ -296,10 +279,9 @@ enum Tools {
             let h = r["h"]?.doubleValue ?? 0
             if w > 0, h > 0 { region = CGRect(x: x, y: y, width: w, height: h) }
         }
-        let scale = min(max(args["scale"]?.intValue ?? 2, 1), 2)
         let returnImage = args["return_image"]?.boolValue ?? true
         let image = try await Capturer.captureScreen(
-            display: display, region: region, scale: scale)
+            display: display, region: region)
         let png = try Capturer.pngData(from: image)
         let path = try Capturer.save(
             png: png, savePath: args["save_path"]?.stringValue, appName: "screen")

@@ -73,7 +73,7 @@ El tool `check_permissions` informa del estado y `{"request": true}` dispara el 
 {"name": "list_apps"}
 {"name": "list_windows", "arguments": {"app_name": "chrome"}}
 {"name": "capture_app", "arguments": {"app": "Safari"}}
-{"name": "capture_app", "arguments": {"app": "com.apple.finder", "window_title": "Descargas", "bring_to_front": true, "scale": 1, "return_image": false}}
+{"name": "capture_app", "arguments": {"app": "com.apple.finder", "window_title": "Descargas", "bring_to_front": true, "return_image": false}}
 {"name": "capture_window", "arguments": {"window_id": 12345}}
 {"name": "capture_screen", "arguments": {"region": {"x": 0, "y": 0, "w": 800, "h": 600}}}
 {"name": "check_permissions", "arguments": {"request": true}}

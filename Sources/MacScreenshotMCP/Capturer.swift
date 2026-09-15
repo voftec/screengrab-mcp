@@ -30,12 +30,12 @@ struct CaptureResult: Sendable {
 }
 
 enum Capturer {
-    /// Capture a single window (even if occluded). Scale 1 or 2 (default 2 = Retina).
-    static func captureWindow(_ window: SCWindow, scale: Int = 2) async throws -> CGImage {
+    /// Capture a single window (even if occluded) at native pixel resolution.
+    static func captureWindow(_ window: SCWindow) async throws -> CGImage {
         let filter = SCContentFilter(desktopIndependentWindow: window)
         let config = SCStreamConfiguration()
-        config.width = Int(window.frame.width) * scale
-        config.height = Int(window.frame.height) * scale
+        config.width = Int(filter.contentRect.width * CGFloat(filter.pointPixelScale))
+        config.height = Int(filter.contentRect.height * CGFloat(filter.pointPixelScale))
         config.showsCursor = false
         config.ignoreShadowsSingleWindow = true
         config.captureResolution = .best
@@ -45,14 +45,14 @@ enum Capturer {
 
     /// Capture a full display or a region of it (points, display coordinates).
     static func captureScreen(
-        display: SCDisplay, region: CGRect?, scale: Int = 2
+        display: SCDisplay, region: CGRect?
     ) async throws -> CGImage {
         let filter = SCContentFilter(display: display, excludingWindows: [])
         let config = SCStreamConfiguration()
         let rect = region ?? display.frame
         config.sourceRect = rect
-        config.width = Int(rect.width) * scale
-        config.height = Int(rect.height) * scale
+        config.width = Int(rect.width * CGFloat(filter.pointPixelScale))
+        config.height = Int(rect.height * CGFloat(filter.pointPixelScale))
         config.showsCursor = false
         config.captureResolution = .best
         return try await SCScreenshotManager.captureImage(

@@ -23,6 +23,10 @@ enum WindowSelection {
         let onScreen = candidates.filter(\.isOnScreen)
         if !onScreen.isEmpty { candidates = onScreen }
 
+        // Prefer titled windows (drops e.g. Finder's untitled desktop strip).
+        let titled = candidates.filter { !$0.title.isEmpty }
+        if !titled.isEmpty { candidates = titled }
+
         return candidates.max(by: { $0.area < $1.area })
     }
 

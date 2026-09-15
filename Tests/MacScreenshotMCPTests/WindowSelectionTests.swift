@@ -42,6 +42,13 @@ final class WindowSelectionTests: XCTestCase {
         XCTAssertEqual(picked?.windowId, 2)
     }
 
+    func testPickMainWindowPrefersTitled() {
+        let untitledBig = w(id: 1, title: "", area: CGSize(width: 5000, height: 5000))
+        let titledSmall = w(id: 2, title: "Downloads", area: CGSize(width: 100, height: 100))
+        let picked = WindowSelection.pickMainWindow(from: [untitledBig, titledSmall])
+        XCTAssertEqual(picked?.windowId, 2)
+    }
+
     func testPickMainWindowIgnoresNonZeroLayerAndEmpty() {
         let overlay = w(id: 1, layer: 5)
         let empty = w(id: 2, area: .zero)
