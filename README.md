@@ -88,3 +88,23 @@ swift build          # debug
 swift test           # tests de selección de ventanas
 scripts/smoke.sh     # prueba stdio end-to-end contra el binario release
 ```
+
+## Troubleshooting
+
+### `install.sh` falla al clonar dependencias (git proxy / insteadOf)
+
+Si `scripts/install.sh` falla con un error como:
+
+```
+fatal: could not read Username for 'https://git-manager.devin.ai': terminal prompts disabled
+```
+
+Es porque la configuración global de git tiene reglas `url.*.insteadOf` que redirigen las URLs de GitHub a través de un proxy (e.g. Devin's `git-manager`). SPM usa git internamente para resolver dependencias y el proxy bloquea la autenticacion.
+
+**Ya corregido**: el script `install.sh` exporta `GIT_CONFIG_GLOBAL=/dev/null` y `GIT_CONFIG_SYSTEM=/dev/null` para ignorar estas reglas durante el build.
+
+Si compilas manualmente con `swift build`, usa el mismo workaround:
+
+```bash
+GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null swift build -c release
+```
