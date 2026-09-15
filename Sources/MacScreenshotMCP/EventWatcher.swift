@@ -28,23 +28,26 @@ private final class WatchBox: @unchecked Sendable {
     let lock = NSLock()
     var continuation: CheckedContinuation<WatchResult, Never>?
     var pendingResult: WatchResult?
-    var runLoop: CFRunLoop?
+    var timeoutTask: Task<Void, Never>?
     var done = false
     var start = Date()
+
+    func isDone() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return done
+    }
 
     func resolve(_ result: WatchResult) {
         lock.lock()
         defer { lock.unlock() }
         guard !done else { return }
         done = true
+        timeoutTask?.cancel()
         if let cont = continuation {
             cont.resume(returning: result)
         } else {
             pendingResult = result
-        }
-        if let rl = runLoop {
-            CFRunLoopStop(rl)
-            CFRunLoopWakeUp(rl)
         }
     }
 
@@ -84,35 +87,50 @@ enum EventWatcher {
     ) async -> WatchResult {
         let wanted = events ?? allEvents
         let box = WatchBox()
-        let boxPtr = Unmanaged.passUnretained(box).toOpaque()
+        let boxPtr = Unmanaged.passRetained(box).toOpaque()
 
         var observer: AXObserver?
         guard AXObserverCreate(pid, axCallback, &observer) == .success,
               let observer else {
-            return WatchResult(
-                waitedMs: 0, timedOut: true)
+            Unmanaged<WatchBox>.fromOpaque(boxPtr).release()
+            return WatchResult(waitedMs: 0, timedOut: true)
         }
 
         let app = AXUIElementCreateApplication(pid)
+        var attached: [(element: AXUIElement, notif: CFString)] = []
         for (notif, event) in notificationToEvent where wanted.contains(event) {
-            AXObserverAddNotification(observer, app, notif, boxPtr)
-            if let window {
-                AXObserverAddNotification(observer, window, notif, boxPtr)
+            if AXObserverAddNotification(observer, app, notif, boxPtr) == .success {
+                attached.append((app, notif))
+            }
+            if let window,
+               AXObserverAddNotification(observer, window, notif, boxPtr) == .success {
+                attached.append((window, notif))
             }
         }
 
-        // Run the observer's run-loop source on a dedicated thread.
+        // Run the observer's run-loop source on a dedicated thread until
+        // the box is resolved, then remove notifications and the source.
+        let boxForThread = box
+        let boxAddr = UInt(bitPattern: boxPtr)
         await withCheckedContinuation { (ready: CheckedContinuation<Void, Never>) in
-            DispatchQueue(label: "screengrab-mcp.eventwatcher").async {
+            let thread = Thread {
                 let rl = CFRunLoopGetCurrent()!
-                CFRunLoopAddSource(
-                    rl, AXObserverGetRunLoopSource(observer), .defaultMode)
-                box.lock.lock()
-                box.runLoop = rl
-                box.lock.unlock()
+                let source = AXObserverGetRunLoopSource(observer)
+                CFRunLoopAddSource(rl, source, .defaultMode)
                 ready.resume()
-                CFRunLoopRun()
+                while !boxForThread.isDone() {
+                    _ = CFRunLoopRunInMode(.defaultMode, 0.25, true)
+                }
+                for (element, notif) in attached {
+                    AXObserverRemoveNotification(observer, element, notif)
+                }
+                CFRunLoopRemoveSource(rl, source, .defaultMode)
+                Unmanaged<WatchBox>
+                    .fromOpaque(UnsafeMutableRawPointer(bitPattern: boxAddr)!)
+                    .release()
             }
+            thread.name = "screengrab-mcp.eventwatcher"
+            thread.start()
         }
 
         return await withCheckedContinuation { cont in
@@ -126,12 +144,17 @@ enum EventWatcher {
             box.lock.unlock()
 
             let timeout = TimeInterval(min(max(timeoutSeconds, 1), 300))
-            Task {
+            let task = Task {
                 try? await Task.sleep(nanoseconds: UInt64(timeout * 1e9))
                 box.resolve(
                     WatchResult(
                         waitedMs: Int(timeout * 1000), timedOut: true))
             }
+            box.lock.lock()
+            box.timeoutTask = task
+            let alreadyDone = box.done
+            box.lock.unlock()
+            if alreadyDone { task.cancel() }
         }
     }
 }
