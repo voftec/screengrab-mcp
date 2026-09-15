@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 echo "==> Building release binary..."
 swift build -c release
 
-BIN=".build/release/mac-screenshot-mcp"
+BIN=".build/release/screengrab-mcp"
 DEST="/usr/local/bin"
 
 if [ ! -w "$DEST" ]; then
@@ -14,5 +14,5 @@ if [ ! -w "$DEST" ]; then
   mkdir -p "$DEST"
 fi
 
-cp "$BIN" "$DEST/mac-screenshot-mcp"
-echo "==> Installed to $DEST/mac-screenshot-mcp"
+cp "$BIN" "$DEST/screengrab-mcp"
+echo "==> Installed to $DEST/screengrab-mcp"

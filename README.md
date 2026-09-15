@@ -1,4 +1,4 @@
-# mac-screenshot-mcp
+# screengrab-mcp
 
 Servidor MCP (stdio) en Swift 6 para macOS que permite a cualquier IDE/IA (Cursor, Claude Desktop, Windsurf, Zed…) listar apps y ventanas abiertas y capturar imágenes PNG de una app concreta, una ventana, o una región de la pantalla — igual que ⌘⇧4 pero automatizado.
 
@@ -12,6 +12,8 @@ Usa **ScreenCaptureKit** (`SCScreenshotManager`, disponible desde macOS 14). La 
 ## Instalación
 
 ```bash
+git clone https://github.com/voftec/screengrab-mcp.git
+cd screengrab-mcp
 scripts/install.sh        # swift build -c release + copia a /usr/local/bin (o ~/.local/bin)
 ```
 
@@ -19,7 +21,7 @@ O manualmente:
 
 ```bash
 swift build -c release
-cp .build/release/mac-screenshot-mcp /usr/local/bin/
+cp .build/release/screengrab-mcp /usr/local/bin/
 ```
 
 ## Permisos
@@ -37,8 +39,8 @@ El tool `check_permissions` informa del estado y `{"request": true}` dispara el 
 ```json
 {
   "mcpServers": {
-    "mac-screenshot": {
-      "command": "/usr/local/bin/mac-screenshot-mcp"
+    "screengrab": {
+      "command": "/usr/local/bin/screengrab-mcp"
     }
   }
 }
@@ -49,8 +51,8 @@ El tool `check_permissions` informa del estado y `{"request": true}` dispara el 
 ```json
 {
   "context_servers": {
-    "mac-screenshot": {
-      "command": { "path": "/usr/local/bin/mac-screenshot-mcp", "args": [] }
+    "screengrab": {
+      "command": { "path": "/usr/local/bin/screengrab-mcp", "args": [] }
     }
   }
 }

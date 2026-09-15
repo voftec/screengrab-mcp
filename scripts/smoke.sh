@@ -3,7 +3,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-BIN="${1:-.build/release/mac-screenshot-mcp}"
+BIN="${1:-.build/release/screengrab-mcp}"
 APP="${APP:-Finder}"
 
 {

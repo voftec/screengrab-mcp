@@ -2,7 +2,7 @@ import Foundation
 import MCP
 
 let server = Server(
-    name: "mac-screenshot-mcp",
+    name: "screengrab-mcp",
     version: "0.1.0",
     capabilities: .init(tools: .init(listChanged: false))
 )
