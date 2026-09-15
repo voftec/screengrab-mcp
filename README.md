@@ -32,6 +32,8 @@ La captura requiere el permiso de **Screen Recording** (Grabación de pantalla).
 
 El tool `check_permissions` informa del estado y `{"request": true}` dispara el diálogo del sistema.
 
+`read_ui` y `event_driven_screengrab` requieren además el permiso de **Accessibility** (Accesibilidad): `System Settings > Privacy & Security > Accessibility`.
+
 ## Configuración
 
 ### Cursor (`~/.cursor/mcp.json`) / Claude Desktop (`claude_desktop_config.json`) / Windsurf
@@ -67,7 +69,26 @@ El tool `check_permissions` informa del estado y `{"request": true}` dispara el 
 | `capture_app` | Captura la ventana principal de una app por nombre, bundle id o pid |
 | `capture_window` | Captura una ventana por `window_id` |
 | `capture_screen` | Pantalla completa o `region {x,y,w,h}` |
-| `check_permissions` | Estado del permiso de Screen Recording |
+| `read_ui` | Árbol de accesibilidad de la ventana de una app (roles, títulos, valores, frames). Requiere permiso de Accessibility |
+| `event_driven_screengrab` | Espera un evento de UI (ventana creada/movida, cambio de título/foco/valor) y captura al ocurrir (o al timeout). Requiere Accessibility + Screen Recording |
+| `check_permissions` | Estado de los permisos de Screen Recording y Accessibility |
+
+### Parámetros de captura (capture_app, capture_window, capture_screen, event_driven_screengrab)
+
+| Parámetro | Descripción |
+|---|---|
+| `quality` | `"high"` (defecto): PNG a resolución nativa · `"low"`: JPEG q0.6 reducido a `max_width` |
+| `format` | `"png"` \| `"jpeg"` — explícito, sobreescribe el defecto de `quality` |
+| `jpeg_quality` | 0–1 (defecto 0.6 en low, 0.85 en high+jpeg) |
+| `max_width` | Reduce para que width ≤ max_width (defecto 1024 en low) |
+| `save_path` | Ruta destino (defecto `~/Pictures/mcp-captures/`) |
+| `return_image` | Incluir la imagen base64 en la respuesta (defecto true) |
+| `compare_with` | Ruta a un PNG/JPEG previo: compara píxel a píxel y escribe `<path>-diff.png` |
+| `return_diff_image` | Incluir también la imagen de diff inline (defecto false) |
+
+`capture_app` además acepta: `window_title`, `bring_to_front`, `open` (abre la app si no está corriendo y espera hasta 15s a que tenga ventana), `delay_seconds` (0–60). `capture_window` acepta `delay_seconds`. `event_driven_screengrab` acepta `events` (array), `timeout_seconds` (máx 300) y `settle_ms`.
+
+`read_ui` acepta: `app`, `window_title`, `max_depth` (defecto 12), `max_nodes` (defecto 1500).
 
 ### Ejemplos
 
@@ -76,12 +97,29 @@ El tool `check_permissions` informa del estado y `{"request": true}` dispara el 
 {"name": "list_windows", "arguments": {"app_name": "chrome"}}
 {"name": "capture_app", "arguments": {"app": "Safari"}}
 {"name": "capture_app", "arguments": {"app": "com.apple.finder", "window_title": "Descargas", "bring_to_front": true, "return_image": false}}
+{"name": "capture_app", "arguments": {"app": "Notes", "open": true, "delay_seconds": 2, "quality": "low"}}
+{"name": "capture_app", "arguments": {"app": "Safari", "compare_with": "~/Pictures/mcp-captures/Safari-20260101-120000.png", "return_image": false}}
 {"name": "capture_window", "arguments": {"window_id": 12345}}
 {"name": "capture_screen", "arguments": {"region": {"x": 0, "y": 0, "w": 800, "h": 600}}}
+{"name": "read_ui", "arguments": {"app": "Simulator", "max_depth": 6}}
+{"name": "event_driven_screengrab", "arguments": {"app": "Simulator", "events": ["ui_changed", "title_changed"], "timeout_seconds": 10, "quality": "low"}}
 {"name": "check_permissions", "arguments": {"request": true}}
 ```
 
-Todas las capturas guardan el PNG (por defecto en `~/Pictures/mcp-captures/<app>-<timestamp>.png`, o en `save_path`) y devuelven la imagen en base64 más un JSON con `path`, `width`, `height`, `app`, `window_id`, `title`, `timestamp`. Con `return_image: false` se omite el base64 para respuestas más rápidas.
+Todas las capturas guardan la imagen (por defecto en `~/Pictures/mcp-captures/<app>-<timestamp>.<png|jpg>`, o en `save_path`) y devuelven la imagen en base64 más un JSON con `path`, `width`, `height`, `app`, `window_id`, `title`, `timestamp`. Con `return_image: false` se omite el base64 para respuestas más rápidas. Con `compare_with` el JSON incluye `diff` (`changed_pixels`, `changed_percent`, `bounding_box`, `diff_path`).
+
+### Resources
+
+El servidor expone `~/Pictures/mcp-captures/` como recursos MCP (`resources/list` → `file://` URIs, `resources/read` devuelve el binario base64). Solo se sirven archivos dentro de ese directorio.
+
+## Para agentes
+
+Bucle barato para verificar cambios de UI sin saturar el contexto:
+
+1. `read_ui` para inspeccionar el árbol de accesibilidad (texto, gratis en tokens).
+2. Actuar (clic, teclear) desde tu IDE o con `event_driven_screengrab` esperando el evento resultante.
+3. `event_driven_screengrab` con `quality: "low"` + `return_image: false` → JSON con `path` y `bytes`, imagen pequeña si se pide.
+4. `capture_app` con `compare_with` apuntando a la captura anterior → `diff.changed_percent` te dice si la UI cambió sin enviar imágenes, y `<path>-diff.png` marca en rojo lo que cambió.
 
 ## Desarrollo
 
