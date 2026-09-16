@@ -1,0 +1,88 @@
+LICENCIA DE USO DE SOFTWARE PROPIETARIO — SCREENGRAB-MCP
+======================================================
+
+Copyright (c) 2025–2026 Voftec. Todos los derechos reservados.
+
+1. TITULARIDAD Y PROTECCIÓN LEGAL
+
+   El software "screengrab-mcp", incluyendo su código fuente, código objeto,
+   documentación, interfaces y archivos asociados (en adelante, el
+   "Software"), es obra original titularidad exclusiva de Voftec (en adelante,
+   el "Titular") y se encuentra protegido por la Ley N.º 11.723 de Propiedad
+   Intelectual de la República Argentina, los tratados internacionales de
+   derecho de autor aplicables (incluido el Convenio de Berna) y la normativa
+   vigente en materia de propiedad intelectual.
+
+   La protección del Software es automática desde su creación y no requiere
+   registro alguno. La publicación del código fuente en repositorios bajo
+   control del Titular no implica cesión de derechos ni licencia abierta de
+   ningún tipo.
+
+2. CARÁCTER DEL SOFTWARE
+
+   El Software es SOFTWARE PROPIETARIO. NO es software de código abierto
+   ("open source") ni software libre. No se otorga ninguna licencia de las
+   identificadas como OSI, FSF o similares.
+
+3. LICENCIA DE USO LIMITADA
+
+   El Titular otorga al usuario final una licencia personal, revocable,
+   no exclusiva, intransferible y no sublicenciable para instalar y usar el
+   Software exclusivamente en equipos propios o bajo su control, para sus
+   fines internos o de evaluación.
+
+4. PROHIBICIONES
+
+   Sin autorización previa y escrita del Titular, se prohíbe expresamente:
+
+   a) copiar, reproducir o distribuir el Software, en todo o en parte, por
+      cualquier medio o formato;
+   b) vender, alquilar, ceder, licenciar, sublicenciar o transferir el
+      Software a terceros;
+   c) modificar, adaptar, traducir o crear obras derivadas del Software;
+   d) realizar ingeniería inversa, descompilar o desensamblar el Software, así
+      como cualquier intento de obtener o derivar su código fuente, salvo en
+      la medida mínima en que dicha restricción esté prohibida por la ley
+      aplicable con carácter imperativo;
+   e) eludir, alterar o remover avisos de propiedad intelectual, marcas,
+      etiquetas o mecanismos técnicos de protección;
+   f) publicar o redistribuir el Software, su código fuente o sus binarios en
+      repositorios públicos, registros de paquetes o cualquier canal de
+      distribución.
+
+5. AUSENCIA DE GARANTÍA
+
+   El Software se entrega "TAL CUAL" (as is), sin garantía expresa ni
+   implícita de ninguna naturaleza, incluidas, entre otras, garantías de
+   comerciabilidad, idoneidad para un fin particular o no infracción de
+   derechos de terceros.
+
+6. LIMITACIÓN DE RESPONSABILIDAD
+
+   En la máxima medida permitida por la ley aplicable, el Titular no será
+   responsable por daños directos, indirectos, incidentales, especiales,
+   consecuentes o punitivos, ni por pérdida de datos, beneficios o
+   interrupción de actividad derivados del uso o imposibilidad de uso del
+   Software.
+
+7. TERMINACIÓN
+
+   La licencia queda automáticamente terminada ante el incumplimiento de
+   cualquiera de sus términos, sin necesidad de notificación previa. A su
+   terminación, el usuario deberá destruir todas las copias del Software en
+   su poder.
+
+8. JURISDICCIÓN Y LEY APLICABLE
+
+   Esta licencia se rige por las leyes de la República Argentina. Cualquier
+   controversia será sometida a los tribunales ordinarios de la Ciudad
+   Autónoma de Buenos Aires, renunciando a cualquier otro fuero o
+   jurisdicción.
+
+9. CONTACTO
+
+   Para solicitar autorizaciones de uso, licencias comerciales o consultas:
+   Voftec — https://github.com/voftec
+
+SOFTWARE PROPRIETARIO — NO ES CÓDIGO ABIERTO.
+USO NO AUTORIZADO, REPRODUCCIÓN O INGENIERÍA INVERSA PROHIBIDOS.

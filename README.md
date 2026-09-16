@@ -148,3 +148,7 @@ Si compilas manualmente con `swift build`, usa el mismo workaround:
 ```bash
 GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null swift build -c release
 ```
+
+## Licencia
+
+Software propietario de Voftec — ver `LICENSE`. No es código abierto: se prohíbe su reproducción, redistribución e ingeniería inversa sin autorización escrita.
